@@ -14,12 +14,14 @@ import java.util.ArrayList;
 import java.awt.Font;
 
 public class GraphicsPanel extends JPanel implements MouseListener {
+    private boolean[][] clicked;
     private int[][] board;
     private int rows;
     private int cols;
     private int mines;
 
     public GraphicsPanel() {
+        clicked = new boolean[9][9];
         board = new int[9][9];
         rows = board.length;
         cols = board[0].length;
@@ -29,12 +31,30 @@ public class GraphicsPanel extends JPanel implements MouseListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        int x = 16;
-        int y = 16;
+        int x = 38;
+        int y = 38;
+        /*
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < rows; j++) {
-                //find file to display here!
+                Image a = readBoardImage(i, j);
+                g.drawImage(a, x, y, null);
+                x += 76;
             }
+            x = 38;
+            y += 76;
+        }
+        y = 38;
+        */
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < rows; j++) {
+                if (!clicked[i][j]) {
+                    Image a = readImage("blank");
+                    g.drawImage(a, x, y, null);
+                    x += 76;
+                }
+            }
+            x = 38;
+            y += 76;
         }
     }
 
@@ -57,18 +77,40 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                 if (board[i][j] == 0) {
                     int count = 0;
                     for (int k = i-1; k < i+2; k++) {
-                        for (int l = j-1; l < i+2; l++) {
-                            if (((k>=0 && k<board.length) && (l>=0 && l<board[0].length)) && board[k][l] == 9) {
+                        for (int l = j-1; l < j+2; l++) {
+                            if (((k>=0 && k<rows) && (l>=0 && l<cols)) && board[k][l] == 9) {
                                 count++;
                             }
                         }
                     }
-                    if (count == 0) {
-                        count--;
-                    }
                     board[i][j] = count;
                 }
+                clicked[i][j] = false;
             }
+        }
+    }
+
+    public BufferedImage readImage(String name) {
+        try {
+            BufferedImage image;
+            image = ImageIO.read(new File("images/"+name+".png"));
+            return image;
+        }
+        catch (IOException e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    public BufferedImage readBoardImage(int r, int c) {
+        try {
+            BufferedImage image;
+            image = ImageIO.read(new File("images/"+board[r][c]+".png"));
+            return image;
+        }
+        catch (IOException e) {
+            System.out.println(e);
+            return null;
         }
     }
 
