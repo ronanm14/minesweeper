@@ -7,7 +7,7 @@ public class MainFrame implements Runnable {
         JFrame f = new JFrame("Minesweeper");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(760,792);
-        f.setLocation(500,500);
+        f.setLocation(400,100);
 
         p = new GraphicsPanel();
         f.add(p);

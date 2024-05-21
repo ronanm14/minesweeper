@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.awt.Font;
 
 public class GraphicsPanel extends JPanel implements MouseListener {
+    private boolean[][] flagged;
     private boolean[][] clicked;
     private int[][] board;
     private int rows;
@@ -21,19 +22,21 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private int mines;
 
     public GraphicsPanel() {
+        flagged = new boolean[9][9];
         clicked = new boolean[9][9];
         board = new int[9][9];
         rows = board.length;
         cols = board[0].length;
         mines = 10;
         initializeBoard();
+        this.addMouseListener(this);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         int x = 38;
         int y = 38;
-        /*
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < rows; j++) {
                 Image a = readBoardImage(i, j);
@@ -44,14 +47,17 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             y += 76;
         }
         y = 38;
-        */
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < rows; j++) {
                 if (!clicked[i][j]) {
                     Image a = readImage("blank");
+                    if (flagged[i][j]) {
+                        a = readImage("flag");
+                    }
                     g.drawImage(a, x, y, null);
-                    x += 76;
                 }
+                x += 76;
             }
             x = 38;
             y += 76;
@@ -78,14 +84,13 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                     int count = 0;
                     for (int k = i-1; k < i+2; k++) {
                         for (int l = j-1; l < j+2; l++) {
-                            if (((k>=0 && k<rows) && (l>=0 && l<cols)) && board[k][l] == 9) {
+                            if (boardCheck(k, l) && board[k][l] == 9) {
                                 count++;
                             }
                         }
                     }
                     board[i][j] = count;
                 }
-                clicked[i][j] = false;
             }
         }
     }
@@ -114,7 +119,75 @@ public class GraphicsPanel extends JPanel implements MouseListener {
         }
     }
 
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+        Point click = e.getPoint();
+        int r = ((int) click.getY() - 38)/76;
+        int c = ((int) click.getX() - 38)/76;
+        if (boardCheck(r, c)) {
+            if (e.getButton() == 1) {
+                clicked[r][c] = true;
+                if (board[r][c] == 0) {
+                    clearZeros(r, c);
+                } else if (board[r][c] == 9) {
+                    lose();
+                }
+            }
+            if (e.getButton() == 3) {
+                flagged[r][c] = !flagged[r][c];
+            }
+        }
+    }
+
+    public void clearZeros(int r, int c) {
+        //coords are represented by a table
+        //to get coords, set row to num/9 and col to num%9
+        ArrayList<Integer> zeroList = new ArrayList<>();
+        zeroList.add(r*9 + c);
+        for (int n = 0; n < zeroList.size(); n++) {
+            int i = zeroList.get(n)/9;
+            int j = zeroList.get(n)%9;
+            for (int k = i-1; k < i+2; k++) {
+                for (int l = j-1; l < j+2; l++) {
+                    if (boardCheck(k, l) && (!clicked[k][l] && board[k][l] == 0)) {
+                        clicked[k][l] = true;
+                        zeroList.add(k*9 + l);
+                    }
+                }
+            }
+        }
+
+        /*
+        ArrayList<Integer> zeroList2 = new ArrayList<>();
+        boolean newZero = true;
+        while (newZero) {
+            newZero = false;
+            for (Integer n : zeroList) {
+                int i = n/9;
+                int j = n%9;
+                for (int k = i-1; k < i+2; k++) {
+                    for (int l = j-1; l < j+2; l++) {
+                        if (boardCheck(k, l) && (!clicked[k][l] && board[k][l] == 0)) {
+                            clicked[k][l] = true;
+                            zeroList2.add(k*9 + l);
+                            newZero = true;
+                        }
+                    }
+                }
+            }
+            zeroList = new ArrayList<>();
+            for (Integer z : zeroList2) {
+                zeroList.add(z);
+            }
+        }
+        */
+    }
+
+    public void lose() {}
+
+    public boolean boardCheck(int r, int c) {
+        return (r>=0 && r<rows) && (c>=0 && c<cols);
+    }
+
     public void mouseReleased(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
