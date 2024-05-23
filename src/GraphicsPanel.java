@@ -17,6 +17,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private boolean[][] flagged;
     private boolean[][] clicked;
     private int[][] board;
+    private boolean lose;
     private int rows;
     private int cols;
     private int mines;
@@ -61,6 +62,12 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             }
             x = 38;
             y += 76;
+        }
+
+        if (lose) {
+            int num = (int) (Math.random()*6)+1;
+            Image q = readImage("lose"+num);
+            g.drawImage(q, 100, 100, null);
         }
     }
 
@@ -129,7 +136,8 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                 if (board[r][c] == 0) {
                     clearZeros(r, c);
                 } else if (board[r][c] == 9) {
-                    lose();
+                    lose = true;
+                    MainFrame.lose();
                 }
             }
             if (e.getButton() == 3) {
@@ -148,11 +156,19 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             int j = zeroList.get(n)%9;
             for (int k = i-1; k < i+2; k++) {
                 for (int l = j-1; l < j+2; l++) {
-                    if (boardCheck(k, l) && (!clicked[k][l] && board[k][l] == 0)) {
+                    if (boardCheck(k, l) && (!clicked[k][l] /*&& board[k][l] == 0*/)) {
                         clicked[k][l] = true;
-                        zeroList.add(k*9 + l);
+                        if (board[k][l] == 0) {
+                            zeroList.add(k * 9 + l);
+                        }
                     }
                 }
+            }
+        }
+        /*
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < rows; j++) {
+                if ()
             }
         }
 
@@ -181,8 +197,6 @@ public class GraphicsPanel extends JPanel implements MouseListener {
         }
         */
     }
-
-    public void lose() {}
 
     public boolean boardCheck(int r, int c) {
         return (r>=0 && r<rows) && (c>=0 && c<cols);

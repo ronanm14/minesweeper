@@ -2,6 +2,7 @@ import javax.swing.*;
 
 public class MainFrame implements Runnable {
     private GraphicsPanel p;
+    public static boolean endGame = false;
 
     public MainFrame () {
         JFrame f = new JFrame("Minesweeper");
@@ -18,9 +19,14 @@ public class MainFrame implements Runnable {
         thread.start();
     }
 
+    public static void lose() {
+        endGame = true;
+    }
+
     public void run() {
-        while (true) {
+        while (!endGame) {
             p.repaint();
         }
+        p.repaint();
     }
 }
