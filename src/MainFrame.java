@@ -7,7 +7,7 @@ public class MainFrame implements Runnable {
     public MainFrame () {
         JFrame f = new JFrame("Minesweeper");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setSize(760,792);
+        f.setSize(760,842);
         f.setLocation(400,100);
 
         p = new GraphicsPanel();
@@ -19,7 +19,7 @@ public class MainFrame implements Runnable {
         thread.start();
     }
 
-    public static void lose() {
+    public static void end() {
         endGame = true;
     }
 

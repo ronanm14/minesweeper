@@ -18,6 +18,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private boolean[][] clicked;
     private int[][] board;
     private boolean lose;
+    private boolean win;
     private int rows;
     private int cols;
     private int mines;
@@ -36,7 +37,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         int x = 38;
-        int y = 38;
+        int y = 88;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < rows; j++) {
@@ -47,7 +48,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             x = 38;
             y += 76;
         }
-        y = 38;
+        y = 88;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < rows; j++) {
@@ -64,10 +65,21 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             y += 76;
         }
 
+        if (win) {
+            g.setColor(Color.magenta);
+            g.setFont(new Font("Comic Sans", Font.PLAIN, 72));
+            g.drawString("you win :)", 240, 60);
+        }
+
         if (lose) {
+            g.setColor(Color.red);
+            g.setFont(new Font("Comic Sans", Font.PLAIN, 72));
+            g.drawString("you lose :(", 240, 60);
+            /*
             int num = (int) (Math.random()*6)+1;
             Image q = readImage("lose"+num);
             g.drawImage(q, 100, 100, null);
+            */
         }
     }
 
@@ -128,7 +140,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
 
     public void mousePressed(MouseEvent e) {
         Point click = e.getPoint();
-        int r = ((int) click.getY() - 38)/76;
+        int r = ((int) click.getY() - 88)/76;
         int c = ((int) click.getX() - 38)/76;
         if (boardCheck(r, c)) {
             if (e.getButton() == 1) {
@@ -137,13 +149,14 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                     clearZeros(r, c);
                 } else if (board[r][c] == 9) {
                     lose = true;
-                    MainFrame.lose();
+                    MainFrame.end();
                 }
             }
             if (e.getButton() == 3) {
                 flagged[r][c] = !flagged[r][c];
             }
         }
+        winCheck();
     }
 
     public void clearZeros(int r, int c) {
@@ -200,6 +213,18 @@ public class GraphicsPanel extends JPanel implements MouseListener {
 
     public boolean boardCheck(int r, int c) {
         return (r>=0 && r<rows) && (c>=0 && c<cols);
+    }
+
+    public void winCheck() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < rows; j++) {
+                if (!clicked[i][j] && (board[i][j] != 9 && !flagged[i][j])) {
+                    return;
+                }
+            }
+        }
+        win = true;
+        MainFrame.end();
     }
 
     public void mouseReleased(MouseEvent e) {}
