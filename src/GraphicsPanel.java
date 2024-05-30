@@ -22,14 +22,13 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private int rows;
     private int cols;
     private int mines;
+    private int imgSize;
 
-    public GraphicsPanel() {
-        flagged = new boolean[9][9];
-        clicked = new boolean[9][9];
-        board = new int[9][9];
-        rows = board.length;
-        cols = board[0].length;
-        mines = 10;
+    public GraphicsPanel(int num) {
+        setVars(num);
+        flagged = new boolean[rows][cols];
+        clicked = new boolean[rows][cols];
+        board = new int[rows][cols];
         initializeBoard();
         this.addMouseListener(this);
     }
@@ -40,18 +39,18 @@ public class GraphicsPanel extends JPanel implements MouseListener {
         int y = 88;
 
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < rows; j++) {
+            for (int j = 0; j < cols; j++) {
                 Image a = readBoardImage(i, j);
                 g.drawImage(a, x, y, null);
-                x += 76;
+                x += imgSize;
             }
             x = 38;
-            y += 76;
+            y += imgSize;
         }
         y = 88;
 
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < rows; j++) {
+            for (int j = 0; j < cols; j++) {
                 if (!clicked[i][j]) {
                     Image a = readImage("blank");
                     if (flagged[i][j]) {
@@ -59,10 +58,10 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                     }
                     g.drawImage(a, x, y, null);
                 }
-                x += 76;
+                x += imgSize;
             }
             x = 38;
-            y += 76;
+            y += imgSize;
         }
 
         if (win) {
@@ -75,11 +74,6 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             g.setColor(Color.red);
             g.setFont(new Font("Comic Sans", Font.PLAIN, 72));
             g.drawString("you lose :(", 240, 60);
-            /*
-            int num = (int) (Math.random()*6)+1;
-            Image q = readImage("lose"+num);
-            g.drawImage(q, 100, 100, null);
-            */
         }
     }
 
@@ -98,7 +92,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
             }
         }
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < rows; j++) {
+            for (int j = 0; j < cols; j++) {
                 if (board[i][j] == 0) {
                     int count = 0;
                     for (int k = i-1; k < i+2; k++) {
@@ -117,7 +111,11 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     public BufferedImage readImage(String name) {
         try {
             BufferedImage image;
-            image = ImageIO.read(new File("images/"+name+".png"));
+            if (imgSize != 76) {
+                image = ImageIO.read(new File("images/"+name+"b.png"));
+            } else {
+                image = ImageIO.read(new File("images/"+name+".png"));
+            }
             return image;
         }
         catch (IOException e) {
@@ -129,7 +127,11 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     public BufferedImage readBoardImage(int r, int c) {
         try {
             BufferedImage image;
-            image = ImageIO.read(new File("images/"+board[r][c]+".png"));
+            if (imgSize != 76) {
+                image = ImageIO.read(new File("images/"+board[r][c]+"b.png"));
+            } else {
+                image = ImageIO.read(new File("images/"+board[r][c]+".png"));
+            }
             return image;
         }
         catch (IOException e) {
@@ -140,8 +142,8 @@ public class GraphicsPanel extends JPanel implements MouseListener {
 
     public void mousePressed(MouseEvent e) {
         Point click = e.getPoint();
-        int r = ((int) click.getY() - 88)/76;
-        int c = ((int) click.getX() - 38)/76;
+        int r = ((int) click.getY() - 88)/imgSize;
+        int c = ((int) click.getX() - 38)/imgSize;
         if (boardCheck(r, c)) {
             if (e.getButton() == 1) {
                 clicked[r][c] = true;
@@ -178,37 +180,6 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                 }
             }
         }
-        /*
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < rows; j++) {
-                if ()
-            }
-        }
-
-        /*
-        ArrayList<Integer> zeroList2 = new ArrayList<>();
-        boolean newZero = true;
-        while (newZero) {
-            newZero = false;
-            for (Integer n : zeroList) {
-                int i = n/9;
-                int j = n%9;
-                for (int k = i-1; k < i+2; k++) {
-                    for (int l = j-1; l < j+2; l++) {
-                        if (boardCheck(k, l) && (!clicked[k][l] && board[k][l] == 0)) {
-                            clicked[k][l] = true;
-                            zeroList2.add(k*9 + l);
-                            newZero = true;
-                        }
-                    }
-                }
-            }
-            zeroList = new ArrayList<>();
-            for (Integer z : zeroList2) {
-                zeroList.add(z);
-            }
-        }
-        */
     }
 
     public boolean boardCheck(int r, int c) {
@@ -217,14 +188,33 @@ public class GraphicsPanel extends JPanel implements MouseListener {
 
     public void winCheck() {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < rows; j++) {
-                if (!clicked[i][j] && (board[i][j] != 9 && !flagged[i][j])) {
+            for (int j = 0; j < cols; j++) {
+                if (!clicked[i][j] && (board[i][j] != 9 || !flagged[i][j])) {
                     return;
                 }
             }
         }
         win = true;
         MainFrame.end();
+    }
+
+    public void setVars (int num) {
+        if (num == 1) {
+            rows = 9;
+            cols = 9;
+            mines = 10;
+            imgSize = 76;
+        } else if (num == 2) {
+            rows = 16;
+            cols = 16;
+            mines = 40;
+            imgSize = 38;
+        } else {
+            rows = 16;
+            cols = 30;
+            mines = 99;
+            imgSize = 38;
+        }
     }
 
     public void mouseReleased(MouseEvent e) {}
