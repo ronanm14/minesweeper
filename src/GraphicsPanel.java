@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.awt.Font;
 
 public class GraphicsPanel extends JPanel implements MouseListener {
+    //private boolean background;
     private boolean[][] flagged;
     private boolean[][] clicked;
     private int[][] board;
@@ -25,6 +26,7 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private int imgSize;
 
     public GraphicsPanel(int num) {
+        //background = true;
         setVars(num);
         flagged = new boolean[rows][cols];
         clicked = new boolean[rows][cols];
@@ -38,16 +40,19 @@ public class GraphicsPanel extends JPanel implements MouseListener {
         int x = 38;
         int y = 88;
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Image a = readBoardImage(i, j);
-                g.drawImage(a, x, y, null);
-                x += imgSize;
+        //if (background) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    Image a = readBoardImage(i, j);
+                    g.drawImage(a, x, y, null);
+                    x += imgSize;
+                }
+                x = 38;
+                y += imgSize;
             }
-            x = 38;
-            y += imgSize;
-        }
-        y = 88;
+            y = 88;
+            //background = false;
+        //}
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -162,19 +167,20 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     }
 
     public void clearZeros(int r, int c) {
-        //coords are represented by a table
-        //to get coords, set row to num/9 and col to num%9
-        ArrayList<Integer> zeroList = new ArrayList<>();
-        zeroList.add(r*9 + c);
-        for (int n = 0; n < zeroList.size(); n++) {
-            int i = zeroList.get(n)/9;
-            int j = zeroList.get(n)%9;
+        ArrayList<Integer> zeroListR = new ArrayList<>();
+        ArrayList<Integer> zeroListC = new ArrayList<>();
+        zeroListR.add(r);
+        zeroListC.add(c);
+        for (int n = 0; n < zeroListR.size(); n++) {
+            int i = zeroListR.get(n);
+            int j = zeroListC.get(n);
             for (int k = i-1; k < i+2; k++) {
                 for (int l = j-1; l < j+2; l++) {
-                    if (boardCheck(k, l) && (!clicked[k][l] /*&& board[k][l] == 0*/)) {
+                    if (boardCheck(k, l) && !clicked[k][l]) {
                         clicked[k][l] = true;
                         if (board[k][l] == 0) {
-                            zeroList.add(k * 9 + l);
+                            zeroListR.add(k);
+                            zeroListC.add(l);
                         }
                     }
                 }
