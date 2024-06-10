@@ -2,6 +2,11 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        MainFrame m = new MainFrame(1);
+    }
+}
+
+        /*
         Scanner s = new Scanner(System.in);
         System.out.println("Welcome to Minesweeper!");
         System.out.println("What type of game would you like to play?");
@@ -12,5 +17,4 @@ public class Main {
         }
         //to fix code, just set num to always equal 1
         MainFrame m = new MainFrame(num);
-    }
-}
+        */

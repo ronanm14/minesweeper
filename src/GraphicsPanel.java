@@ -6,15 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
-import javax.swing.JPanel;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.awt.Font;
 
 public class GraphicsPanel extends JPanel implements MouseListener {
-    //private boolean background;
     private boolean[][] flagged;
     private boolean[][] clicked;
     private int[][] board;
@@ -26,7 +23,6 @@ public class GraphicsPanel extends JPanel implements MouseListener {
     private int imgSize;
 
     public GraphicsPanel(int num) {
-        //background = true;
         setVars(num);
         flagged = new boolean[rows][cols];
         clicked = new boolean[rows][cols];
@@ -40,20 +36,6 @@ public class GraphicsPanel extends JPanel implements MouseListener {
         int x = 38;
         int y = 88;
 
-        //if (background) {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    Image a = readBoardImage(i, j);
-                    g.drawImage(a, x, y, null);
-                    x += imgSize;
-                }
-                x = 38;
-                y += imgSize;
-            }
-            y = 88;
-            //background = false;
-        //}
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (!clicked[i][j]) {
@@ -61,6 +43,9 @@ public class GraphicsPanel extends JPanel implements MouseListener {
                     if (flagged[i][j]) {
                         a = readImage("flag");
                     }
+                    g.drawImage(a, x, y, null);
+                } else {
+                    Image a = readBoardImage(i, j);
                     g.drawImage(a, x, y, null);
                 }
                 x += imgSize;
